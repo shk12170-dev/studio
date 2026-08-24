@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moment Studio</title>
+  <title> Moment Studio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
     
@@ -122,7 +122,7 @@
 <body>
 
 <div class="app-header">
-  <h2>🎨 Moment Studio</h2>
+  <h2>🎨 즐거운 추억을 담아보세요! Moment Studio</h2>
 </div>
 
 <div class="main-layout">
