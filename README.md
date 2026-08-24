@@ -12,7 +12,6 @@
                   url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed;
       color: #2d3748; 
       padding: 30px 20px; 
-      perspective: 1000px;
     }
 
     .app-header { 
@@ -24,7 +23,7 @@
       border: 1px solid rgba(255, 255, 255, 0.9);
       padding: 18px 28px; 
       border-radius: 20px; 
-      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08);
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
@@ -40,11 +39,11 @@
       border: 1px solid rgba(255, 255, 255, 0.9);
       padding: 24px; 
       border-radius: 24px; 
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 1);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
       max-height: 85vh; 
       overflow-y: auto; 
     }
-    .panel h3 { font-size: 14px; font-weight: 800; margin-bottom: 14px; color: #4a5568; border-bottom: 2px solid rgba(226, 232, 240, 0.8); padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .panel h3 { font-size: 14px; font-weight: 800; margin-bottom: 14px; color: #4a5568; border-bottom: 2px solid rgba(226, 232, 240, 0.8); padding-bottom: 8px; text-transform: uppercase; }
     .section { margin-bottom: 22px; }
     
     label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #4a5568; }
@@ -57,13 +56,12 @@
       font-size: 13px; 
       margin-bottom: 10px; 
       outline: none;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
     }
     input[type="range"] { width: 100%; margin-bottom: 10px; accent-color: #3182ce; }
     
     button { 
       width: 100%; 
-      padding: 12px; 
+      padding: 11px; 
       background: linear-gradient(135deg, #3182ce, #2b6cb0); 
       color: white; 
       border: none; 
@@ -71,16 +69,14 @@
       font-weight: 700; 
       cursor: pointer; 
       margin-bottom: 8px; 
-      transition: all 0.15s ease; 
       font-size: 13px; 
-      box-shadow: 0 6px 14px rgba(49, 130, 206, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+      transition: all 0.15s ease;
     }
-    button:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(49, 130, 206, 0.4); }
-    button:active { transform: translateY(1px); }
+    button:hover { transform: translateY(-2px); }
     
-    .btn-secondary { background: linear-gradient(135deg, #edf2f7, #e2e8f0); color: #4a5568; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06); border: 1px solid #cbd5e0; }
-    .btn-danger { background: linear-gradient(135deg, #e53e3e, #c53030); box-shadow: 0 6px 14px rgba(229, 62, 62, 0.35); }
+    .btn-secondary { background: linear-gradient(135deg, #edf2f7, #e2e8f0); color: #4a5568; border: 1px solid #cbd5e0; box-shadow: none; }
+    .btn-danger { background: linear-gradient(135deg, #e53e3e, #c53030); box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3); }
     .btn-group { display: flex; gap: 8px; }
 
     .preview-area { 
@@ -106,7 +102,7 @@
       align-items: center; 
       justify-content: center; 
       max-width: 100%; 
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 8px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
     }
     canvas { display: block; max-width: 100%; max-height: 65vh; object-fit: contain; }
 
@@ -122,12 +118,11 @@
 </div>
 
 <div class="main-layout">
-  <!-- 좌측 컨트롤 패널 -->
   <div class="panel">
     
-    <!-- 1. 이미지 업로드 -->
+    <!-- 1. 이미지 업로드 & 검증 -->
     <div class="section">
-      <h3>1. 이미지 등록 (EXIF 자동 제거)</h3>
+      <h3>1. 이미지 등록 (EXIF 제거 & 유효성 검사)</h3>
       <input type="file" id="imageInput" accept="image/png, image/jpeg">
     </div>
 
@@ -146,7 +141,7 @@
       <button onclick="generateAIMessageOnly()">✍️ AI 문구 추천받기</button>
     </div>
 
-    <!-- 3. 화면비 및 텍스트 편집 -->
+    <!-- 3. 화면비 및 극단적 입력 방어 편집 -->
     <div class="section">
       <h3>3. 화면비 및 문구 디테일 편집</h3>
       <label>화면 비율 (1:1 / 4:5 / 9:16)</label>
@@ -156,28 +151,28 @@
         <option value="9:16">9:16 (스토리/릴스)</option>
       </select>
 
-      <label>문구 입력 (줄바꿈/이모지 지원)</label>
-      <textarea id="textInput" rows="3">소소한 일상 속,\n작은 행복 찾기 ☕</textarea>
+      <label>문구 입력 (최대 150자)</label>
+      <textarea id="textInput" rows="3" maxlength="150">소소한 일상 속,\n작은 행복 찾기 ☕</textarea>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div>
           <label>X 위치 (%)</label>
-          <input type="range" id="posX" min="10" max="90" value="50">
+          <input type="range" id="posX" min="0" max="100" value="50">
         </div>
         <div>
           <label>Y 위치 (%)</label>
-          <input type="range" id="posY" min="10" max="90" value="80">
+          <input type="range" id="posY" min="0" max="100" value="80">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
         <div>
           <label>크기 (px)</label>
-          <input type="number" id="fontSize" value="40" min="10" max="120">
+          <input type="number" id="fontSize" value="40" min="10" max="150">
         </div>
         <div>
           <label>회전 (도)</label>
-          <input type="number" id="rotation" value="0" min="-180" max="180">
+          <input type="number" id="rotation" value="0" min="-360" max="360">
         </div>
         <div>
           <label>글자 색상</label>
@@ -186,9 +181,9 @@
       </div>
     </div>
 
-    <!-- 4. 템플릿 관리 -->
+    <!-- 4. 템플릿 관리 (LocalStorage & JSON 복원) -->
     <div class="section">
-      <h3>4. 템플릿 관리 (LocalStorage)</h3>
+      <h3>4. 템플릿 & 백업 관리</h3>
       <input type="text" id="tplName" placeholder="템플릿 이름 입력">
       <div class="btn-group">
         <button onclick="saveTemplate()">저장/수정</button>
@@ -197,6 +192,12 @@
       <select id="tplList" onchange="loadTemplate(this.value)">
         <option value="">-- 저장된 템플릿 불러오기 --</option>
       </select>
+      
+      <div class="btn-group" style="margin-top: 8px;">
+        <button class="btn-secondary" onclick="exportJSON()">JSON 내보내기</button>
+        <button class="btn-secondary" onclick="document.getElementById('jsonFileInput').click()">JSON 불러오기</button>
+        <input type="file" id="jsonFileInput" accept=".json" style="display: none;" onchange="importJSON(event)">
+      </div>
     </div>
 
     <!-- 5. 내보내기 -->
@@ -208,7 +209,6 @@
     <div id="toast"></div>
   </div>
 
-  <!-- 우측 미리보기 영역 -->
   <div class="preview-area">
     <div class="canvas-wrapper">
       <canvas id="studioCanvas"></canvas>
@@ -259,13 +259,27 @@
     setTimeout(() => { t.style.display = 'none'; }, 3000);
   }
 
+  // 1. PNG, JPEG 유효성 검증 및 EXIF 안전 메타데이터 제거 로드
   document.getElementById('imageInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const validTypes = ['image/png', 'image/jpeg'];
+    if (!validTypes.includes(file.type)) {
+      showToast('PNG 또는 JPEG 형식의 이미지 파일만 지원합니다.', true);
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (evt) => {
       const img = new Image();
-      img.onload = () => { currentImg = img; render(); showToast('이미지가 로드되었습니다.'); };
+      img.onload = () => { 
+        currentImg = img; 
+        render(); 
+        showToast('이미지가 성공적으로 로드되었습니다.'); 
+      };
+      img.onerror = () => { showToast('이미지를 불러오는데 실패했습니다.', true); };
       img.src = evt.target.result;
     };
     reader.readAsDataURL(file);
@@ -278,18 +292,28 @@
     state.text = randomText;
     document.getElementById('textInput').value = randomText;
     render();
-    showToast('✨ AI 문구가 새로 추천되었습니다!');
+    showToast('✨ AI 추천 문구가 적용되었습니다.');
+  }
+
+  // 3. 극단적 입력 조건 및 경계값 검사 함수
+  function clampInputs() {
+    state.posX = Math.min(100, Math.max(0, parseFloat(state.posX) || 0));
+    state.posY = Math.min(100, Math.max(0, parseFloat(state.posY) || 0));
+    state.fontSize = Math.min(150, Math.max(10, parseInt(state.fontSize) || 20));
+    state.rotation = Math.min(360, Math.max(-360, parseInt(state.rotation) || 0));
   }
 
   document.getElementById('ratioSelect').addEventListener('change', e => { state.ratio = e.target.value; render(); });
   document.getElementById('textInput').addEventListener('input', e => { state.text = e.target.value; render(); });
   document.getElementById('posX').addEventListener('input', e => { state.posX = e.target.value; render(); });
   document.getElementById('posY').addEventListener('input', e => { state.posY = e.target.value; render(); });
-  document.getElementById('fontSize').addEventListener('input', e => { state.fontSize = parseInt(e.target.value) || 20; render(); });
-  document.getElementById('rotation').addEventListener('input', e => { state.rotation = parseInt(e.target.value) || 0; render(); });
+  document.getElementById('fontSize').addEventListener('input', e => { state.fontSize = e.target.value; render(); });
+  document.getElementById('rotation').addEventListener('input', e => { state.rotation = e.target.value; render(); });
   document.getElementById('textColor').addEventListener('input', e => { state.textColor = e.target.value; render(); });
 
+  // 2. 화면비 미리보기 렌더링 동기화
   function render() {
+    clampInputs();
     const dim = RATIOS[state.ratio];
     canvas.width = dim.w;
     canvas.height = dim.h;
@@ -342,27 +366,29 @@
     }
   }
 
+  // 5. EXIF가 완전히 제거된 완성본 이미지 내보내기
   function downloadImage() {
     const a = document.createElement('a');
-    a.download = `card_${state.ratio.replace(':', '_')}.png`;
+    a.download = `moment_studio_${state.ratio.replace(':', '_')}.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
-    showToast('🖼️ 이미지 다운로드가 완료되었습니다.');
+    showToast('🖼️ 이미지가 성공적으로 다운로드되었습니다.');
   }
 
+  // 4. LocalStorage 템플릿 CRUD
   function saveTemplate() {
     const name = document.getElementById('tplName').value.trim();
-    if (!name) return showToast('템플릿 이름을 입력하세요.', true);
-    const store = JSON.parse(localStorage.getItem('card_studio_tpl') || '{}');
+    if (!name) return showToast('템플릿 이름을 입력해주세요.', true);
+    const store = JSON.parse(localStorage.getItem('moment_studio_tpl') || '{}');
     store[name] = { ...state };
-    localStorage.setItem('card_studio_tpl', JSON.stringify(store));
+    localStorage.setItem('moment_studio_tpl', JSON.stringify(store));
     showToast(`'${name}' 템플릿이 저장되었습니다.`);
     updateTemplateList();
   }
 
   function loadTemplate(name) {
     if (!name) return;
-    const store = JSON.parse(localStorage.getItem('card_studio_tpl') || '{}');
+    const store = JSON.parse(localStorage.getItem('moment_studio_tpl') || '{}');
     if (store[name]) {
       Object.assign(state, store[name]);
       document.getElementById('ratioSelect').value = state.ratio;
@@ -380,9 +406,9 @@
   function deleteTemplate() {
     const name = document.getElementById('tplList').value;
     if (!name) return showToast('삭제할 템플릿을 선택하세요.', true);
-    const store = JSON.parse(localStorage.getItem('card_studio_tpl') || '{}');
+    const store = JSON.parse(localStorage.getItem('moment_studio_tpl') || '{}');
     delete store[name];
-    localStorage.setItem('card_studio_tpl', JSON.stringify(store));
+    localStorage.setItem('moment_studio_tpl', JSON.stringify(store));
     showToast(`'${name}' 템플릿이 삭제되었습니다.`);
     updateTemplateList();
   }
@@ -390,12 +416,46 @@
   function updateTemplateList() {
     const list = document.getElementById('tplList');
     list.innerHTML = '<option value="">-- 저장된 템플릿 불러오기 --</option>';
-    const store = JSON.parse(localStorage.getItem('card_studio_tpl') || '{}');
+    const store = JSON.parse(localStorage.getItem('moment_studio_tpl') || '{}');
     Object.keys(store).forEach(k => {
       const opt = document.createElement('option');
       opt.value = k; opt.innerText = k;
       list.appendChild(opt);
     });
+  }
+
+  // 5. JSON 백업 내보내기 & 복원
+  function exportJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "moment_studio_settings.json");
+    dlAnchor.click();
+    showToast('📄 설정값이 JSON 파일로 내보내졌습니다.');
+  }
+
+  function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const importedState = JSON.parse(e.target.result);
+        Object.assign(state, importedState);
+        document.getElementById('ratioSelect').value = state.ratio || '1:1';
+        document.getElementById('textInput').value = state.text || '';
+        document.getElementById('posX').value = state.posX ?? 50;
+        document.getElementById('posY').value = state.posY ?? 80;
+        document.getElementById('fontSize').value = state.fontSize ?? 40;
+        document.getElementById('rotation').value = state.rotation ?? 0;
+        document.getElementById('textColor').value = state.textColor || '#ffffff';
+        render();
+        showToast('📂 JSON 설정값이 성공적으로 복원되었습니다.');
+      } catch (err) {
+        showToast('유효하지 않은 JSON 파일입니다.', true);
+      }
+    };
+    reader.readAsText(file);
   }
 </script>
 </body>
