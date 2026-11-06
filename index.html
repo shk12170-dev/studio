@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment Studio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', -apple-system, system-ui, sans-serif; }
+    body { min-height: 100vh; background: linear-gradient(135deg, #e8eefb 0%, #f3e8fb 100%); color: #2d3748; padding: 24px 16px; }
+    .app-header { max-width: 1400px; margin: 0 auto 20px; background: rgba(255,255,255,.9); padding: 16px 24px; border-radius: 20px; box-shadow: 0 10px 25px -10px rgba(0,0,0,.1); }
+    .app-header h1 { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #3182ce, #805ad5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .main-layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 460px 1fr; gap: 24px; }
+    .panel, .preview-area { background: rgba(255,255,255,.9); padding: 22px; border-radius: 24px; box-shadow: 0 20px 40px -15px rgba(0,0,0,.1); }
+    .panel { max-height: 88vh; overflow-y: auto; }
+    .panel h2 { font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #4a5568; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .section { margin-bottom: 22px; }
+    label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #4a5568; }
+    input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px 12px; background: #fff; border: 1px solid #cbd5e0; border-radius: 12px; font-size: 13px; margin-bottom: 10px; }
+    input[type="range"] { width: 100%; margin-bottom: 10px; accent-color: #3182ce; }
+    button { width: 100%; padding: 11px; background: linear-gradient(135deg, #3182ce, #2b6cb0); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 8px; font-size: 13px; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-secondary { background: #edf2f7; color: #4a5568; border: 1px solid #cbd5e0; }
+    .btn-danger { background: linear-gradient(135deg, #e53e3e, #c53030); }
+    .btn-green { background: linear-gradient(135deg, #38a169, #2f855a); }
+    .btn-group { display: flex; gap: 8px; }
+    .preview-area { display: flex; align-items: center; justify-content: center; }
+    .canvas-wrapper { border-radius: 16px; overflow: hidden; background: #111827; max-width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,.35); }
+    canvas { display: block; max-width: 100%; max-height: 72vh; width: auto; height: auto; }
+    #toast { margin-top: 10px; padding: 10px; border-radius: 10px; font-size: 12px; text-align: center; display: none; font-weight: 600; line-height: 1.4; white-space: pre-line; }
+    .toast-success { background: #c6f6d5; color: #22543d; }
+    .toast-error { background: #fed7d7; color: #742a2a; }
+    .license-box { font-size: 11px; color: #718096; background: #f7fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 6px; word-break: break-all; }
+    .hint { font-size: 11px; color: #718096; margin-bottom: 8px; }
+    table.report { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+    table.report td, table.report th { border: 1px solid #e2e8f0; padding: 4px 6px; text-align: left; }
+    .pass { color: #22863a; font-weight: 800; } .fail { color: #c53030; font-weight: 800; }
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } .panel { max-height: none; } }
+  </style>
+</head>
+<body>
+
+<header class="app-header"><h1>🎨 즐거운 추억을 담아보세요! Moment Studio</h1></header>
+
+<main class="main-layout">
+  <div class="panel">
+
+    <div class="section">
+      <h2>1. 이미지 업로드 (PNG / JPEG)</h2>
+      <input type="file" id="imageInput" accept="image/png, image/jpeg" aria-label="이미지 파일 선택">
+      <div class="license-box"><strong>출처 및 사용 권한:</strong> <span id="licenseText">기본 그래픽 배경 (본인 제작)</span></div>
+      <p class="hint">업로드한 이미지는 본인이 사용 권한을 가진 파일이어야 합니다. 이미지는 브라우저 안에서만 처리되며 서버로 전송되지 않고, 템플릿·JSON에도 포함되지 않습니다.</p>
+    </div>
+
+    <div class="section">
+      <h2>2. 화면 비율</h2>
+      <select id="ratioSelect" aria-label="화면 비율">
+        <option value="1:1">1:1 (1080x1080)</option>
+        <option value="4:5">4:5 (1080x1350)</option>
+        <option value="9:16">9:16 (1080x1920)</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h2>3. 문구 편집</h2>
+      <label for="textInput">문구 입력</label>
+      <textarea id="textInput" rows="3" maxlength="1000"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><label for="posX">X 위치 (%)</label><input type="range" id="posX" min="0" max="100" value="50"></div>
+        <div><label for="posY">Y 위치 (%)</label><input type="range" id="posY" min="0" max="100" value="80"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+        <div><label for="fontSize">크기 (px)</label><input type="number" id="fontSize" value="40" min="5" max="200"></div>
+        <div><label for="rotation">회전 (도)</label><input type="number" id="rotation" value="0" min="-360" max="360"></div>
+        <div><label for="textColor">글자 색상</label><input type="color" id="textColor" value="#ffffff" style="height:38px;padding:2px;width:100%;"></div>
+      </div>
+      <button class="btn-secondary" id="runTestsBtn" type="button">🧪 극단 입력 12건 자동 검사 실행</button>
+      <div id="testReport"></div>
+    </div>
+
+    <div class="section">
+      <h2>4. 템플릿 (저장 / 수정 / 삭제)</h2>
+      <label for="tplList">저장된 템플릿</label>
+      <select id="tplList"><option value="">-- 선택하여 불러오기 --</option></select>
+      <label for="tplName">템플릿 이름</label>
+      <input type="text" id="tplName" placeholder="템플릿 이름 입력" maxlength="40">
+      <div class="btn-group">
+        <button type="button" id="tplCreate">새로 저장</button>
+        <button type="button" id="tplUpdate" class="btn-secondary">선택 항목 수정</button>
+        <button type="button" id="tplDelete" class="btn-danger">삭제</button>
+      </div>
+      <button type="button" id="tplPresets" class="btn-secondary">기본 템플릿 3개 추가 (기존 유지)</button>
+    </div>
+
+    <div class="section">
+      <h2>5. JSON 백업 / 복원 · 다운로드</h2>
+      <div class="btn-group">
+        <button type="button" class="btn-secondary" id="jsonExport">JSON 내보내기</button>
+        <button type="button" class="btn-secondary" id="jsonImportBtn">JSON 불러오기</button>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" style="display:none;">
+      </div>
+      <button type="button" class="btn-secondary" id="jsonBadTest">⚠️ 손상 JSON 3종 거부 검사</button>
+      <button type="button" class="btn-green" id="downloadBtn" disabled>🖼️ 완성 이미지 다운로드 (PNG)</button>
+      <p class="hint" id="fontStatus">폰트 로딩 중… 완료되면 다운로드 버튼이 활성화됩니다.</p>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <div class="preview-area">
+    <div class="canvas-wrapper"><canvas id="studioCanvas" aria-label="미리보기"></canvas></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const canvas = $('studioCanvas');
+  const ctx = canvas.getContext('2d');
+  let currentImg = null;
+  let fontsReady = false;
+
+  const RATIOS = { '1:1': { w: 1080, h: 1080 }, '4:5': { w: 1080, h: 1350 }, '9:16': { w: 1080, h: 1920 } };
+  const FONT_STACK = "'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
+  const STORE_KEY = 'moment_studio_templates_v2';
+  const OLD_STORE_KEY = 'moment_studio_tpl';
+  const REQUIRED_KEYS = ['ratio', 'text', 'posX', 'posY', 'fontSize', 'rotation', 'textColor'];
+  const DEFAULT_STATE = { ratio: '1:1', text: '소소한 일상 속,\n작은 행복 찾기 ☕', posX: 50, posY: 80, fontSize: 40, rotation: 0, textColor: '#ffffff' };
+  const state = { ...DEFAULT_STATE };
+
+  /* ---------- 공통 유틸 ---------- */
+  let toastTimer;
+  function showToast(msg, isErr = false) {
+    const t = $('toast');
+    t.className = isErr ? 'toast-error' : 'toast-success';
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, 5000);
+  }
+  const clamp = (v, min, max, def) => {
+    const n = typeof v === 'number' ? v : parseFloat(v);
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
+  };
+
+  /* ---------- 상태 검증 (렌더 전 항상 통과) ---------- */
+  function sanitize(s) {
+    s.ratio = RATIOS[s.ratio] ? s.ratio : '1:1';
+    s.text = typeof s.text === 'string' ? s.text.slice(0, 1000) : '';
+    s.posX = clamp(s.posX, 0, 100, 50);
+    s.posY = clamp(s.posY, 0, 100, 50);
+    s.fontSize = Math.round(clamp(s.fontSize, 5, 200, 40));
+    s.rotation = Math.round(clamp(s.rotation, -360, 360, 0));
+    s.textColor = /^#[0-9a-fA-F]{6}$/.test(s.textColor) ? s.textColor : '#ffffff';
+    return s;
+  }
+  // 외부 입력(JSON/템플릿)은 보정하지 않고 엄격하게 검사한다. 오류 문자열 배열 반환
+  function validateExternal(o) {
+    const errs = [];
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return ['JSON 최상위가 객체가 아닙니다'];
+    const missing = REQUIRED_KEYS.filter(k => !(k in o));
+    if (missing.length) return ['필수 항목 누락: ' + missing.join(', ')];
+    if (!RATIOS[o.ratio]) errs.push('ratio 값이 1:1, 4:5, 9:16 중 하나가 아닙니다');
+    if (typeof o.text !== 'string') errs.push('text가 문자열이 아닙니다');
+    if (!Number.isFinite(o.posX) || o.posX < 0 || o.posX > 100) errs.push('posX는 0~100 숫자여야 합니다');
+    if (!Number.isFinite(o.posY) || o.posY < 0 || o.posY > 100) errs.push('posY는 0~100 숫자여야 합니다');
+    if (!Number.isFinite(o.fontSize) || o.fontSize < 5 || o.fontSize > 200) errs.push('fontSize는 5~200 숫자여야 합니다');
+    if (!Number.isFinite(o.rotation) || o.rotation < -360 || o.rotation > 360) errs.push('rotation은 -360~360 숫자여야 합니다');
+    if (typeof o.textColor !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(o.textColor)) errs.push('textColor가 #RRGGBB 형식이 아닙니다');
+    return errs;
+  }
+  const pick = o => { const r = {}; REQUIRED_KEYS.forEach(k => r[k] = o[k]); return r; };
+  function applyState(o) { Object.assign(state, pick(o)); sanitize(state); syncInputs(); render(); }
+
+  function syncInputs() {
+    $('ratioSelect').value = state.ratio;
+    $('textInput').value = state.text;
+    $('posX').value = state.posX;
+    $('posY').value = state.posY;
+    $('fontSize').value = state.fontSize;
+    $('rotation').value = state.rotation;
+    $('textColor').value = state.textColor;
+  }
+
+  /* ---------- 렌더링: 미리보기와 다운로드가 같은 canvas·같은 함수 ---------- */
+  function wrapText(c, text, maxW) {
+    const out = [];
+    text.split('\n').forEach(paragraph => {
+      const chars = Array.from(paragraph);
+      let line = '', lastSpace = -1;
+      for (const ch of chars) {
+        const test = line + ch;
+        if (line && c.measureText(test).width > maxW) {
+          if (lastSpace > 0 && ch !== ' ') {
+            out.push(line.slice(0, lastSpace).trimEnd());
+            line = line.slice(lastSpace + 1) + ch;
+          } else {
+            out.push(line);
+            line = ch;
+          }
+          lastSpace = -1;
+          const sp = line.lastIndexOf(' ');
+          if (sp > 0) lastSpace = sp;
+        } else {
+          line = test;
+          if (ch === ' ') lastSpace = line.length - 1;
+        }
+      }
+      out.push(line);
+    });
+    return out;
+  }
+
+  function render() {
+    sanitize(state);
+    const dim = RATIOS[state.ratio];
+    canvas.width = dim.w;
+    canvas.height = dim.h;
+
+    const g = ctx.createLinearGradient(0, 0, dim.w, dim.h);
+    g.addColorStop(0, '#2b4c7e'); g.addColorStop(1, '#6b3fa0');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, dim.w, dim.h);
+
+    if (currentImg) {
+      const imgRatio = currentImg.width / currentImg.height;
+      const canvasRatio = dim.w / dim.h;
+      let rw, rh;
+      if (imgRatio > canvasRatio) { rh = dim.h; rw = dim.h * imgRatio; }
+      else { rw = dim.w; rh = dim.w / imgRatio; }
+      ctx.drawImage(currentImg, (dim.w - rw) / 2, (dim.h - rh) / 2, rw, rh);
+    }
+
+    if (!state.text.trim()) return;
+    ctx.save();
+    ctx.translate(dim.w * state.posX / 100, dim.h * state.posY / 100);
+    ctx.rotate(state.rotation * Math.PI / 180);
+    ctx.fillStyle = state.textColor;
+    ctx.font = `bold ${state.fontSize * 2}px ${FONT_STACK}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,.7)';
+    ctx.shadowBlur = 14; ctx.shadowOffsetX = 3; ctx.shadowOffsetY = 3;
+
+    const lines = wrapText(ctx, state.text, dim.w * 0.9);
+    const lineHeight = state.fontSize * 2.5;
+    const startY = -((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, 0, startY + i * lineHeight));
+    ctx.restore();
+    render.lastLines = lines;
+  }
+
+  /* ---------- 폰트 로딩 ---------- */
+  async function loadFonts() {
+    const done = () => {
+      fontsReady = true;
+      $('downloadBtn').disabled = false;
+      $('fontStatus').textContent = '폰트 로딩 완료. 다운로드할 수 있습니다.';
+      render();
+    };
+    try {
+      await Promise.race([
+        Promise.all([document.fonts.load('bold 40px Pretendard', '가A'), document.fonts.ready]),
+        new Promise(r => setTimeout(r, 5000))
+      ]);
+    } catch (e) { /* 대체 폰트로 진행 */ }
+    done();
+  }
+
+  /* ---------- 이미지 업로드: MIME + 매직바이트, 성공 시에만 상태 교체 ---------- */
+  async function sniff(file) {
+    const b = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+    const png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A].every((v, i) => b[i] === v);
+    const jpg = b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF;
+    return png ? 'png' : jpg ? 'jpeg' : null;
+  }
+  $('imageInput').addEventListener('change', async e => {
+    const input = e.target;
+    const file = input.files[0];
+    if (!file) return;
+    const reject = msg => { showToast('❌ [업로드 거부] ' + msg + '\n기존 작업은 그대로 유지됩니다.', true); input.value = ''; };
+    if (!['image/png', 'image/jpeg'].includes(file.type)) return reject(`지원하지 않는 형식입니다 (${file.type || '알 수 없음'}). PNG, JPEG만 가능합니다.`);
+    let kind;
+    try { kind = await sniff(file); } catch (err) { return reject('파일을 읽을 수 없습니다.'); }
+    if (!kind) return reject('파일 내용이 PNG/JPEG가 아닙니다 (확장자만 바뀐 파일일 수 있습니다).');
+
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      currentImg = img;
+      $('licenseText').textContent = `사용자 업로드 파일 (${file.name}) — 업로드한 사람이 사용 권한을 확인한 이미지`;
+      render();
+      showToast(`✅ 이미지가 로드되었습니다 (${img.width}x${img.height}).`);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject('손상된 이미지 파일입니다.'); };
+    img.src = url;
+  });
+
+  /* ---------- 입력 이벤트 ---------- */
+  const bind = (id, key) => $(id).addEventListener('input', e => { state[key] = e.target.value; render(); });
+  bind('textInput', 'text'); bind('posX', 'posX'); bind('posY', 'posY');
+  bind('fontSize', 'fontSize'); bind('rotation', 'rotation'); bind('textColor', 'textColor');
+  $('ratioSelect').addEventListener('change', e => { state.ratio = e.target.value; render(); });
+
+  /* ---------- 템플릿 CRUD: 고유 UUID, 이름은 속성 ---------- */
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
+  function readStore() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (Array.isArray(raw)) return raw.filter(t => t && t.id && validateExternal(t.data).length === 0);
+      // 구버전(이름 키 객체) 마이그레이션
+      const old = JSON.parse(localStorage.getItem(OLD_STORE_KEY) || 'null');
+      if (old && typeof old === 'object') {
+        const now = new Date().toISOString();
+        const migrated = Object.entries(old).filter(([, v]) => validateExternal(v).length === 0)
+          .map(([name, v]) => ({ id: uuid(), name, createdAt: now, updatedAt: now, data: pick(v) }));
+        writeStore(migrated);
+        return migrated;
+      }
+    } catch (e) { /* 손상 시 빈 목록 */ }
+    return [];
+  }
+  function writeStore(list) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); return true; }
+    catch (e) { showToast('❌ 저장소에 쓸 수 없습니다 (용량 초과 또는 차단). 기존 템플릿은 유지됩니다.', true); return false; }
+  }
+  function refreshList(selectId) {
+    const sel = $('tplList');
+    sel.innerHTML = '<option value="">-- 선택하여 불러오기 --</option>';
+    readStore().forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.id; o.textContent = t.name;
+      sel.appendChild(o);
+    });
+    sel.value = selectId || '';
+  }
+  const tplName = () => $('tplName').value.trim();
+
+  $('tplCreate').addEventListener('click', () => {
+    const name = tplName();
+    if (!name) return showToast('템플릿 이름을 입력해주세요.', true);
+    const list = readStore(), now = new Date().toISOString();
+    const t = { id: uuid(), name, createdAt: now, updatedAt: now, data: pick(sanitize({ ...state })) };
+    if (writeStore([...list, t])) { refreshList(t.id); showToast(`'${name}' 템플릿을 새로 저장했습니다.`); }
+  });
+  $('tplUpdate').addEventListener('click', () => {
+    const id = $('tplList').value;
+    if (!id) return showToast('수정할 템플릿을 먼저 선택하세요.', true);
+    const list = readStore(), t = list.find(x => x.id === id);
+    if (!t) return showToast('선택한 템플릿을 찾을 수 없습니다.', true);
+    t.name = tplName() || t.name;
+    t.data = pick(sanitize({ ...state }));
+    t.updatedAt = new Date().toISOString();
+    if (writeStore(list)) { refreshList(id); showToast(`'${t.name}' 템플릿을 수정했습니다. (다른 템플릿은 변경되지 않음)`); }
+  });
+  $('tplList').addEventListener('change', e => {
+    const t = readStore().find(x => x.id === e.target.value);
+    if (!t) return;
+    applyState(t.data);
+    $('tplName').value = t.name;
+    showToast(`'${t.name}' 템플릿을 불러왔습니다.`);
+  });
+  $('tplDelete').addEventListener('click', () => {
+    const id = $('tplList').value;
+    if (!id) return showToast('삭제할 템플릿을 선택하세요.', true);
+    const list = readStore(), t = list.find(x => x.id === id);
+    if (!t) return showToast('선택한 템플릿을 찾을 수 없습니다.', true);
+    if (!confirm(`'${t.name}' 템플릿을 삭제할까요?`)) return;
+    if (writeStore(list.filter(x => x.id !== id))) { refreshList(); $('tplName').value = ''; showToast(`'${t.name}' 템플릿을 삭제했습니다.`); }
+  });
+  $('tplPresets').addEventListener('click', () => {
+    const now = new Date().toISOString();
+    const base = { rotation: 0, textColor: '#ffffff' };
+    const presets = [
+      ['모던 힐링', { ...base, ratio: '1:1', text: '지친 하루 끝,\n깊은 휴식 🌿', posX: 50, posY: 80, fontSize: 42 }],
+      ['인스타 감성', { ...base, ratio: '4:5', text: 'DAILY MOMENT ✨', posX: 50, posY: 50, fontSize: 50, rotation: -5, textColor: '#ffd700' }],
+      ['스토리 카드', { ...base, ratio: '9:16', text: '오늘의 기록 📸', posX: 50, posY: 85, fontSize: 38 }]
+    ];
+    const list = readStore();
+    list.push(...presets.map(([name, data]) => ({ id: uuid(), name, createdAt: now, updatedAt: now, data })));
+    if (writeStore(list)) { refreshList(); showToast('기본 템플릿 3개를 추가했습니다. 기존 템플릿은 그대로입니다.'); }
+  });
+
+  /* ---------- JSON 백업/복원 ---------- */
+  $('jsonExport').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(pick(sanitize({ ...state })), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `moment_studio_backup_${Date.now()}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    showToast('📄 JSON을 내보냈습니다. (이미지는 포함되지 않음)');
+  });
+  function parseAndValidate(text) {
+    let obj;
+    try { obj = JSON.parse(text); } catch (e) { return { errs: ['JSON 문법이 손상되었습니다'] }; }
+    const errs = validateExternal(obj);
+    return errs.length ? { errs } : { obj };
+  }
+  $('jsonImportBtn').addEventListener('click', () => $('jsonFileInput').click());
+  $('jsonFileInput').addEventListener('change', e => {
+    const input = e.target, file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const { obj, errs } = parseAndValidate(String(reader.result));
+      if (errs) showToast('❌ [가져오기 거부] ' + errs.join(' / ') + '\n기존 작업과 템플릿은 유지됩니다.', true);
+      else { applyState(obj); showToast('📂 JSON에서 설정을 복원했습니다.'); }
+      input.value = '';
+    };
+    reader.onerror = () => { showToast('❌ 파일을 읽을 수 없습니다. 기존 작업은 유지됩니다.', true); input.value = ''; };
+    reader.readAsText(file);
+  });
+  // 실제 가져오기 검증 함수(parseAndValidate)에 손상 샘플을 넣어 거부 여부를 확인
+  $('jsonBadTest').addEventListener('click', () => {
+    const samples = [
+      ['문법 손상', "{ ratio: '1:1', text: missingQuotes }"],
+      ['필수 항목 누락', JSON.stringify({ ratio: '1:1', text: '테스트' })],
+      ['값 범위 오류', JSON.stringify({ ...DEFAULT_STATE, ratio: 'x', fontSize: 'abc' })]
+    ];
+    const before = JSON.stringify(state);
+    const res = samples.map(([n, s]) => [n, !!parseAndValidate(s).errs]);
+    const ok = res.every(r => r[1]) && JSON.stringify(state) === before;
+    showToast((ok ? '✅ 3종 모두 거부되었고 기존 상태가 유지되었습니다.' : '❌ 일부 샘플이 거부되지 않았습니다.') + '\n' + res.map(r => `${r[0]}: ${r[1] ? '거부' : '통과(문제)'}`).join(', '), !ok);
+  });
+
+  /* ---------- 다운로드: 폰트 준비 후, 미리보기와 동일한 canvas를 PNG로 ---------- */
+  $('downloadBtn').addEventListener('click', async () => {
+    if (!fontsReady) return showToast('폰트 로딩이 끝나지 않았습니다. 잠시 후 다시 시도하세요.', true);
+    try { await document.fonts.ready; } catch (e) {}
+    render();
+    canvas.toBlob(blob => {
+      if (!blob) return showToast('❌ 이미지 생성에 실패했습니다. 기존 작업은 유지됩니다.', true);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `moment_studio_${state.ratio.replace(':', '_')}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      showToast(`🖼️ ${canvas.width}x${canvas.height} PNG를 저장했습니다. (캔버스 재인코딩으로 원본 EXIF는 포함되지 않음)`);
+    }, 'image/png');
+  });
+
+  /* ---------- 극단 입력 12건 자동 검사 (실제 sanitize/render 실행, 끝나면 상태 복원) ---------- */
+  const TESTS = [
+    ['01 초장문 300자+', s => { s.text = '가나다라마바사아자차카타파하'.repeat(25); }, () => render.lastLines.length > 1 && render.lastLines.every(l => { ctx.save(); ctx.font = `bold ${state.fontSize * 2}px ${FONT_STACK}`; const w = ctx.measureText(l).width; ctx.restore(); return w <= canvas.width * 0.9 + 1; })],
+    ['02 이모지 연속', s => { s.text = '🔥🎉☕🌸✨🚀💡🌈🎨🍕'; }, () => true],
+    ['03 한/영/日/中 혼합', s => { s.text = '한글 English 日本語 中文 !@#$'; }, () => true],
+    ['04 좌표 최소 0/0', s => { s.posX = 0; s.posY = 0; }, () => state.posX === 0 && state.posY === 0],
+    ['05 좌표 최대 100/100', s => { s.posX = 100; s.posY = 100; }, () => state.posX === 100 && state.posY === 100],
+    ['06 폰트 -10', s => { s.fontSize = -10; }, () => state.fontSize === 5],
+    ['07 폰트 9999', s => { s.fontSize = 9999; }, () => state.fontSize === 200],
+    ['08 회전 -720', s => { s.rotation = -720; }, () => state.rotation === -360],
+    ['09 회전 999', s => { s.rotation = 999; }, () => state.rotation === 360],
+    ['10 12줄 개행', s => { s.text = Array.from({ length: 12 }, (_, i) => 'Line' + (i + 1)).join('\n'); }, () => render.lastLines.length === 12],
+    ['11 공백 전용', s => { s.text = ' \t  '; }, () => true],
+    ['12 NaN/null 주입', s => { s.posX = NaN; s.fontSize = null; s.rotation = undefined; }, () => state.posX === 50 && state.fontSize === 40 && state.rotation === 0]
+  ];
+  $('runTestsBtn').addEventListener('click', () => {
+    const snapshot = { ...state };
+    const rows = TESTS.map(([name, mutate, check]) => {
+      let ok = false, note = '';
+      try {
+        Object.assign(state, snapshot);
+        render.lastLines = [];
+        mutate(state);
+        render();
+        ok = !!check() && ['posX', 'posY', 'fontSize', 'rotation'].every(k => Number.isFinite(state[k]));
+      } catch (err) { note = String(err.message || err); }
+      return [name, ok, note];
+    });
+    Object.assign(state, snapshot); // 검사 후 사용자의 기존 편집 상태 복원
+    sanitize(state); syncInputs(); render();
+    const pass = rows.filter(r => r[1]).length;
+    const rep = $('testReport');
+    rep.innerHTML = '';
+    const tbl = document.createElement('table'); tbl.className = 'report';
+    rows.forEach(([n, ok, note]) => {
+      const tr = tbl.insertRow();
+      tr.insertCell().textContent = n;
+      const c = tr.insertCell(); c.textContent = ok ? 'PASS' : 'FAIL' + (note ? ' ' + note : ''); c.className = ok ? 'pass' : 'fail';
+    });
+    rep.appendChild(tbl);
+    showToast(`극단 입력 검사 ${pass}/${rows.length} 통과. 검사 전 편집 내용은 그대로 복원되었습니다.`, pass !== rows.length);
+  });
+
+  /* ---------- 초기화 ---------- */
+  syncInputs();
+  render();
+  refreshList();
+  loadFonts();
+})();
+</script>
+</body>
+</html>
