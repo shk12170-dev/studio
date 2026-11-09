@@ -1,0 +1,16 @@
+# exiftool 13.61 실행 결과 (사용자 PC, 2026-11-09)
+# 명령: exiftool -FileName -ImageSize -FileType -gps:all -make -model -datetimeoriginal -Artist -Software <3개 PNG>
+======== moment_studio_1_1.png
+File Name                       : moment_studio_1_1.png
+Image Size                      : 1080x1080
+File Type                       : PNG
+======== moment_studio_4_5.png
+File Name                       : moment_studio_4_5.png
+Image Size                      : 1080x1350
+File Type                       : PNG
+======== moment_studio_9_16.png
+File Name                       : moment_studio_9_16.png
+Image Size                      : 1080x1920
+File Type                       : PNG
+    3 image files read
+# GPS, Make, Model, DateTimeOriginal, Artist, Software 항목 없음 = 위치·카메라·작성자 메타데이터 없음
