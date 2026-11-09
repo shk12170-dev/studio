@@ -5,6 +5,7 @@
 | `png/moment_studio_*.png` | 앱에서 저장한 3비율 PNG (1080x1080, 1080x1350, 1080x1920) |
 | `preview/preview_*.png` | 3비율 미리보기 화면 |
 | `preview/preview_selftest_*.webp` | 3비율 미리보기와 극단 입력 12건 자동 검사 12/12 PASS 화면 |
+| `exiftool_capture.png` | exiftool 실행 화면 캡처 (GPS·카메라·작성자 항목 없음) |
 | `exiftool_result.txt` | exiftool로 확인한 메타데이터 결과 (GPS·카메라·작성자 없음) |
 | `incognito_access.png` | 시크릿 모드에서 결과 URL에 로그인 없이 접속한 화면 |
 
